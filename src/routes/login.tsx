@@ -55,12 +55,12 @@ function LoginPage() {
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
-    const { error } = await signIn(values.email, values.password);
+    const { error } = await signIn(values['email'], values['password']);
     if (error) {
       setServerError(friendlyError(error, "Could not log in. Please try again."));
       return;
     }
-    if (!values.remember && typeof window !== "undefined") {
+    if (!values['remember'] && typeof window !== "undefined") {
       // "Remember me" off: clear the persisted session when the tab closes.
       window.addEventListener("pagehide", () => {
         Object.keys(window.localStorage)

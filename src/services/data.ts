@@ -15,10 +15,10 @@ import type { RuleValues } from "@/lib/validation";
 import { logActivity } from "@/services/automation/engine";
 import { DEMO_ACCOUNT } from "@/services/automation/demo";
 
-function unwrap<T>(res: { data: T | null; error: { message: string } | null }): T {
+function unwrap<T>(res: { data: T; error: { message: string } | null }): NonNullable<T> {
   if (res.error) throw new Error(res.error.message);
-  if (res.data === null) throw new Error("No data returned");
-  return res.data;
+  if (res.data === null || res.data === undefined) throw new Error("No data returned");
+  return res.data as NonNullable<T>;
 }
 
 // ---------- Profile ----------
