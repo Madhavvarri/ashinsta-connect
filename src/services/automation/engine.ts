@@ -23,7 +23,7 @@ export interface ProcessResult {
   matchedRule: AutomationRule | null;
   status: ReplyStatus | "no_match" | "skipped";
   replyText: string | null;
-  error?: string;
+  error?: string | undefined;
   evaluations: RuleEvaluation[];
 }
 

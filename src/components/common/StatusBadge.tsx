@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import type { ActivityStatus, ReplyStatus } from "@/types";
 
-export function ReplyStatusBadge({ status, replied }: { status?: ReplyStatus | null; replied: boolean }) {
+export function ReplyStatusBadge({ status, replied }: { status?: ReplyStatus | null | undefined; replied: boolean }) {
   if (status === "simulated") return <Badge variant="amber">Demo reply</Badge>;
   if (status === "sent") return <Badge variant="mint">Replied</Badge>;
   if (status === "failed") return <Badge variant="rose">Failed</Badge>;

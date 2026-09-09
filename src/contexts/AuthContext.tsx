@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+        ...(typeof window !== "undefined" ? { emailRedirectTo: window.location.origin } : {}),
       },
     });
     return { error: error ? error.message : null };

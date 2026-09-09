@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 
 interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  error?: string;
-  hint?: string;
+  error?: string | undefined;
+  hint?: string | undefined;
 }
 
 /** Labelled input with inline validation message (accessible). */
