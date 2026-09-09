@@ -46,7 +46,7 @@ export async function updateProfile(
 ): Promise<Profile> {
   const data = unwrap(
     await supabase.from("profiles").update(patch).eq("user_id", userId).select("*").single(),
-  );
+  ) as unknown as Profile;
   await logActivity(supabase, userId, {
     type: "full_name" in patch ? "profile_updated" : "settings_updated",
     status: "info",
@@ -136,7 +136,7 @@ export async function createRule(
       .insert({ ...values, user_id: userId, instagram_account_id: instagramAccountId })
       .select("*")
       .single(),
-  );
+  ) as unknown as AutomationRule;
   await logActivity(supabase, userId, {
     type: "rule_created",
     status: "success",
@@ -149,7 +149,7 @@ export async function createRule(
 export async function updateRule(userId: string, id: string, values: RuleValues): Promise<AutomationRule> {
   const data = unwrap(
     await supabase.from("automation_rules").update(values).eq("id", id).eq("user_id", userId).select("*").single(),
-  );
+  ) as unknown as AutomationRule;
   await logActivity(supabase, userId, {
     type: "rule_updated",
     status: "info",
@@ -168,7 +168,7 @@ export async function toggleRule(userId: string, rule: AutomationRule, isActive:
       .eq("user_id", userId)
       .select("*")
       .single(),
-  );
+  ) as unknown as AutomationRule;
   await logActivity(supabase, userId, {
     type: isActive ? "rule_enabled" : "rule_disabled",
     status: isActive ? "success" : "warning",
