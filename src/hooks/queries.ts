@@ -1,10 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { INSTAGRAM_CALLBACK_PATH } from "@/lib/config";
 import { friendlyError } from "@/lib/format";
+import { completeInstagramConnect, getInstagramConnectUrl, getInstagramSetupStatus } from "@/lib/instagram.functions";
 import * as data from "@/services/data";
 import type { AutomationRule, InstagramAccount, Profile } from "@/types";
 import type { RuleValues } from "@/lib/validation";
+
+const OAUTH_STATE_KEY = "ashinsta.instagram.oauth_state";
+
+function randomState() {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+export function instagramRedirectUri() {
+  return `${window.location.origin}${INSTAGRAM_CALLBACK_PATH}`;
+}
 
 export const keys = {
   profile: (u: string) => ["profile", u] as const,
@@ -71,16 +86,43 @@ export function useInstagramAccount() {
   return useQuery({ queryKey: keys.instagram(uid), enabled: !!uid, queryFn: () => data.getInstagramAccount(uid) });
 }
 
-export function useConnectDemoInstagram() {
+/** Whether the server has the Meta credentials needed for a real connection. */
+export function useInstagramSetupStatus() {
   const uid = useUserId();
+  const fetchStatus = useServerFn(getInstagramSetupStatus);
+  return useQuery({ queryKey: ["instagram-setup", uid], enabled: !!uid, queryFn: () => fetchStatus() });
+}
+
+/** Starts the official Meta login: asks the server for the authorize URL and redirects. */
+export function useConnectInstagram() {
+  const getUrl = useServerFn(getInstagramConnectUrl);
+  return useMutation({
+    mutationFn: async () => {
+      const state = randomState();
+      sessionStorage.setItem(OAUTH_STATE_KEY, state);
+      const { url } = await getUrl({ data: { redirectUri: instagramRedirectUri(), state } });
+      window.location.assign(url);
+    },
+    onError: (e) => toast.error(friendlyError(e, "Could not start the Instagram login.")),
+  });
+}
+
+/** Finishes the connection after Meta redirects back with a code. */
+export function useCompleteInstagramConnect() {
+  const complete = useServerFn(completeInstagramConnect);
   const invalidate = useInvalidateAll();
   return useMutation({
-    mutationFn: () => data.connectDemoInstagram(uid),
-    onSuccess: () => {
-      toast.success("Demo Instagram account connected", { description: "This is a simulated connection." });
+    mutationFn: async (input: { code: string; state: string | null }) => {
+      const expected = sessionStorage.getItem(OAUTH_STATE_KEY);
+      sessionStorage.removeItem(OAUTH_STATE_KEY);
+      if (!expected || expected !== input.state) throw new Error("Login session expired — please try connecting again.");
+      return complete({ data: { code: input.code, redirectUri: instagramRedirectUri() } });
+    },
+    onSuccess: (r) => {
+      toast.success(`Instagram account @${r.username} connected`);
+      if (r.webhookWarning) toast.warning("Comment notifications not enabled", { description: r.webhookWarning });
       invalidate();
     },
-    onError: (e) => toast.error(friendlyError(e, "Could not connect the demo account.")),
   });
 }
 
