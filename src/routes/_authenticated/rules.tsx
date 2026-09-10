@@ -5,15 +5,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FlaskConical, Loader2, Pencil, Plus, Trash2, Zap } from "lucide-react";
 import { z } from "zod";
 import { useInstagramAccount, useReplies, useRuleMutations, useRules } from "@/hooks/queries";
-import { useDemoActions } from "@/hooks/useDemoActions";
-import { IS_DEMO } from "@/lib/config";
 import { ruleSchema, type RuleValues } from "@/lib/validation";
 import { evaluateRules, selectRule } from "@/services/automation/matcher";
 import { MATCH_TYPE_LABELS, type AutomationRule, type MatchType } from "@/types";
 import { PageHeader } from "@/components/common/PageHeader";
 import { CardSkeleton, EmptyState, ErrorState, GlassCard } from "@/components/common/States";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import { DemoChip } from "@/components/common/DemoBadge";
 import { FormField } from "@/components/auth/FormField";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -92,7 +89,6 @@ function RuleTester({ rules }: { rules: AutomationRule[] }) {
       <div className="flex items-center gap-2">
         <FlaskConical className="size-4 text-brand" aria-hidden />
         <h2 className="font-display text-[15px] font-semibold">Test a rule</h2>
-        {IS_DEMO && <DemoChip />}
       </div>
       <Input aria-label="Sample comment" placeholder="Can you tell me the price?" value={text} onChange={(e) => setText(e.target.value)} className="mt-3 h-11 rounded-xl bg-card/70" />
       {text.trim() && (
@@ -120,7 +116,6 @@ function RulesPage() {
   const rules = useRules();
   const account = useInstagramAccount();
   const { create, update, toggle, remove } = useRuleMutations();
-  const demo = useDemoActions(account.data);
   const search = Route.useSearch();
   const navigate = useNavigate();
   const [editing, setEditing] = useState<AutomationRule | "new" | null>(null);
@@ -153,12 +148,7 @@ function RulesPage() {
           icon={Zap}
           title="No rules yet"
           description="Create a rule like “price” → “Check our profile for pricing” to start replying automatically."
-          action={
-            <>
-              <Button variant="brand" onClick={() => setEditing("new")}><Plus aria-hidden />Create rule</Button>
-              {IS_DEMO && <Button variant="outline" onClick={() => demo.createSampleRules.mutate()} disabled={demo.createSampleRules.isPending}>Add sample rules</Button>}
-            </>
-          }
+          action={<Button variant="brand" onClick={() => setEditing("new")}><Plus aria-hidden />Create rule</Button>}
         />
       ) : (
         <div className="space-y-3">

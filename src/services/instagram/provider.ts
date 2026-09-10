@@ -1,66 +1,46 @@
 /**
- * Instagram reply providers.
+ * Instagram reply provider.
  *
  * The automation engine never talks to Instagram directly — it asks a provider.
- * - DemoReplyProvider: simulates a reply. Never contacts Instagram.
- * - MetaGraphReplyProvider: sends a real reply through the official Instagram
- *   Graph API (POST /{comment-id}/replies). Requires a valid access token that
- *   was obtained through official Meta OAuth. Server-side only.
+ * MetaGraphReplyProvider sends a real reply through the official Instagram
+ * Graph API (POST /{comment-id}/replies) using an access token obtained via
+ * official Meta OAuth. Server-side only.
  */
+
+export const DEFAULT_GRAPH_API_VERSION = "v21.0";
+export const GRAPH_BASE_URL = "https://graph.instagram.com";
 
 export interface SendReplyInput {
   instagramCommentId: string;
   message: string;
-  /** Access token for the connected Instagram professional account (production only). */
+  /** Access token for the connected Instagram professional account. */
   accessToken?: string | null;
 }
 
 export interface SendReplyResult {
   ok: boolean;
-  /** "simulated" for demo, "sent" when Meta confirmed, "failed" otherwise */
-  status: "simulated" | "sent" | "failed";
+  /** "sent" when Meta confirmed, "failed" otherwise */
+  status: "sent" | "failed";
   providerReplyId?: string;
   error?: string;
 }
 
 export interface ReplyProvider {
   readonly name: string;
-  readonly isDemo: boolean;
   sendReply(input: SendReplyInput): Promise<SendReplyResult>;
-}
-
-export class DemoReplyProvider implements ReplyProvider {
-  readonly name = "demo";
-  readonly isDemo = true;
-
-  async sendReply(input: SendReplyInput): Promise<SendReplyResult> {
-    // Small artificial delay so the UI shows a realistic loading state.
-    await new Promise((r) => setTimeout(r, 150));
-    if (!input.message.trim()) {
-      return { ok: false, status: "failed", error: "Reply message is empty" };
-    }
-    return {
-      ok: true,
-      status: "simulated",
-      providerReplyId: `demo_${Math.random().toString(36).slice(2, 10)}`,
-    };
-  }
 }
 
 export class MetaGraphReplyProvider implements ReplyProvider {
   readonly name = "meta-graph";
-  readonly isDemo = false;
 
-  constructor(private readonly apiVersion = "v21.0") {}
+  constructor(private readonly apiVersion = DEFAULT_GRAPH_API_VERSION) {}
 
   async sendReply(input: SendReplyInput): Promise<SendReplyResult> {
     if (!input.accessToken) {
-      return { ok: false, status: "failed", error: "Instagram account has no access token" };
+      return { ok: false, status: "failed", error: "Instagram account has no access token — reconnect Instagram" };
     }
     try {
-      const url = `https://graph.facebook.com/${this.apiVersion}/${encodeURIComponent(
-        input.instagramCommentId,
-      )}/replies`;
+      const url = `${GRAPH_BASE_URL}/${this.apiVersion}/${encodeURIComponent(input.instagramCommentId)}/replies`;
       const body = new URLSearchParams({ message: input.message, access_token: input.accessToken });
       const res = await fetch(url, { method: "POST", body });
       const json = (await res.json().catch(() => ({}))) as {
@@ -85,6 +65,6 @@ export class MetaGraphReplyProvider implements ReplyProvider {
   }
 }
 
-export function createReplyProvider(mode: "demo" | "production"): ReplyProvider {
-  return mode === "production" ? new MetaGraphReplyProvider() : new DemoReplyProvider();
+export function createReplyProvider(apiVersion?: string): ReplyProvider {
+  return new MetaGraphReplyProvider(apiVersion ?? DEFAULT_GRAPH_API_VERSION);
 }

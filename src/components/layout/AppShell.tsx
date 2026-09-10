@@ -19,7 +19,6 @@ import { useProfile } from "@/hooks/queries";
 import { initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Logo, LogoMark } from "@/components/common/Logo";
-import { DemoBadge } from "@/components/common/DemoBadge";
 import { AuroraBackground } from "@/components/common/AuroraBackground";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -114,9 +113,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="flex items-center justify-between">
           <Logo to="/dashboard" />
         </div>
-        <div className="mt-3">
-          <DemoBadge />
-        </div>
         <nav aria-label="Main" className="mt-6 flex flex-1 flex-col gap-1">
           {NAV_ITEMS.map((item) => (
             <NavLink key={item.to} item={item} />
@@ -138,7 +134,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           <span className="font-display text-[15px] font-bold tracking-tight">Ashinsta</span>
         </Link>
         <div className="flex items-center gap-2">
-          <DemoBadge />
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Open menu">

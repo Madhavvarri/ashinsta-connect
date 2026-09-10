@@ -32,11 +32,10 @@ function AnalyticsPage() {
 
   if (stats.isError) return <ErrorState onRetry={() => stats.refetch()} />;
   const s = stats.data;
-  const totalReplies = s ? s.repliesSent + s.repliesSimulated + s.repliesFailed : 0;
+  const totalReplies = s ? s.repliesSent + s.repliesFailed : 0;
   const pie = s
     ? [
         { name: "Sent", value: s.repliesSent, color: "var(--mint)" },
-        { name: "Simulated (Demo)", value: s.repliesSimulated, color: "var(--amber)" },
         { name: "Failed", value: s.repliesFailed, color: "var(--rose)" },
       ].filter((p) => p.value > 0)
     : [];
@@ -48,10 +47,10 @@ function AnalyticsPage() {
         {!s ? Array.from({ length: 6 }).map((_, i) => <StatSkeleton key={i} />) : (
           <>
             <StatCard label="Total comments" value={s.totalComments} />
-            <StatCard label="Total replies" value={totalReplies} hint={s.repliesSimulated ? `${s.repliesSimulated} demo` : undefined} hintTone="amber" />
-            <StatCard label="Successful replies" value={s.repliesSent + s.repliesSimulated} hintTone="mint" hint="sent + simulated" />
+            <StatCard label="Total replies" value={totalReplies} />
+            <StatCard label="Successful replies" value={s.repliesSent} hintTone="mint" hint="confirmed by Instagram" />
             <StatCard label="Failed replies" value={s.repliesFailed} hintTone={s.repliesFailed ? "rose" : "muted"} />
-            <StatCard label="Reply rate" value={`${s.totalComments ? Math.round(((s.repliesSent + s.repliesSimulated) / s.totalComments) * 100) : 0}%`} hint="of comments answered" />
+            <StatCard label="Reply rate" value={`${s.totalComments ? Math.round((s.repliesSent / s.totalComments) * 100) : 0}%`} hint="of comments answered" />
             <StatCard label="Active rules" value={s.activeRules} hint={`of ${s.totalRules}`} />
           </>
         )}

@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Logo } from "@/components/common/Logo";
 import { AuroraBackground } from "@/components/common/AuroraBackground";
-import { DemoBadge } from "@/components/common/DemoBadge";
 
 export function AuthCard({
   title,
@@ -19,7 +18,6 @@ export function AuthCard({
       <AuroraBackground />
       <div className="mb-6 flex w-full max-w-md items-center justify-between">
         <Logo />
-        <DemoBadge />
       </div>
       <div className="glass w-full max-w-md rounded-2xl p-6 sm:p-8 animate-fade-up">
         <h1 className="font-display text-2xl font-bold tracking-tight">{title}</h1>

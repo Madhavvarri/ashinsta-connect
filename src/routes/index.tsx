@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Activity, MessageSquare, ShieldCheck, Zap } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
 import { AuroraBackground } from "@/components/common/AuroraBackground";
-import { DemoBadge } from "@/components/common/DemoBadge";
 import { GlassCard } from "@/components/common/States";
 import { Button } from "@/components/ui/button";
 import { APP_NAME, APP_TAGLINE } from "@/lib/config";
@@ -27,7 +26,7 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { n: "1", title: "Connect Instagram", text: "Link your professional account through Meta's official login (or try Demo Mode)." },
+  { n: "1", title: "Connect Instagram", text: "Link your professional account through Meta's official login." },
   { n: "2", title: "Create rules", text: "Pick a keyword like “price” and write the reply you want to send." },
   { n: "3", title: "Relax", text: "New comments are matched and answered automatically. Review everything in Activity." },
 ];
@@ -39,7 +38,6 @@ function Landing() {
       <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <Logo />
         <div className="flex items-center gap-2">
-          <DemoBadge />
           <Button asChild variant="ghost">
             <Link to="/login">Login</Link>
           </Button>
@@ -102,7 +100,7 @@ function Landing() {
             <ul className="mt-4 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
               <li>• Answer common questions (price, shipping, sizes) in seconds</li>
               <li>• Cooldowns stop you from spamming the same reply</li>
-              <li>• Clear Demo Mode to test safely before going live</li>
+              <li>• Built-in rule tester to preview matches before going live</li>
               <li>• Private by design — only you can see your data</li>
             </ul>
           </GlassCard>

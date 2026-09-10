@@ -13,8 +13,7 @@ export interface IncomingComment {
   username: string;
   commentText: string;
   postId: string;
-  isDemo: boolean;
-  /** Production only: access token for sending the reply. */
+  /** Access token of the connected account, used to send the reply. */
   accessToken?: string | null;
 }
 
@@ -31,11 +30,10 @@ export interface ProcessResult {
  * Reusable automation engine.
  *
  * Flow: store comment → load active rules → evaluate (match type, case, cooldown)
- * → select rule → send reply via provider → store reply → log activity.
+ * → select rule → send reply via the official Meta API → store reply → log activity.
  *
- * Works with any Supabase client: the browser client (RLS as the user, demo mode)
- * or the server admin client (webhooks). It never claims a real reply was sent
- * unless the provider returned status "sent".
+ * Works with any Supabase client (webhooks use the server admin client). It never
+ * claims a reply was sent unless Meta returned status "sent".
  */
 export async function processComment(
   client: Client,
@@ -73,7 +71,6 @@ export async function processComment(
         username: input.username,
         comment_text: input.commentText,
         post_id: input.postId,
-        is_demo: input.isDemo,
       })
       .select("id")
       .single();
@@ -83,9 +80,9 @@ export async function processComment(
     commentId = inserted.id;
     await logActivity(client, input.userId, {
       type: "comment_received",
-      status: input.isDemo ? "demo" : "info",
-      message: `${input.isDemo ? "Demo comment" : "Comment"} received from @${input.username}`,
-      metadata: { comment_id: commentId, username: input.username, is_demo: input.isDemo },
+      status: "info",
+      message: `Comment received from @${input.username}`,
+      metadata: { comment_id: commentId, username: input.username },
     });
   }
 
@@ -125,7 +122,7 @@ export async function processComment(
   const rule = selected.rule;
   const replyText = rule.reply_message;
 
-  // 5. Send through provider (demo = simulate, production = official Meta API).
+  // 5. Send through the official Meta API.
   const result = await provider.sendReply({
     instagramCommentId: input.instagramCommentId,
     message: replyText,
@@ -133,7 +130,6 @@ export async function processComment(
   });
 
   const status: ReplyStatus = result.status;
-  const isDemo = provider.isDemo || input.isDemo;
 
   // 6. Store the reply.
   const { error: replyError } = await client.from("comment_replies").insert({
@@ -142,7 +138,6 @@ export async function processComment(
     rule_id: rule.id,
     reply_text: replyText,
     status,
-    is_demo: isDemo,
     error_message: result.error ?? null,
     replied_at: result.ok ? new Date().toISOString() : null,
   });
@@ -153,14 +148,7 @@ export async function processComment(
   }
 
   // 7. Activity log — never say "sent" unless Meta confirmed.
-  if (status === "simulated") {
-    await logActivity(client, input.userId, {
-      type: "reply_simulated",
-      status: "demo",
-      message: `Demo reply simulated to @${input.username} (rule "${rule.keyword}")`,
-      metadata: { comment_id: commentId, rule_id: rule.id, demo: true },
-    });
-  } else if (status === "sent") {
+  if (status === "sent") {
     await logActivity(client, input.userId, {
       type: "reply_sent",
       status: "success",
@@ -203,7 +191,7 @@ export async function getLastRepliedAt(
 export interface ActivityInput {
   type: string;
   message: string;
-  status?: "info" | "success" | "warning" | "error" | "demo";
+  status?: "info" | "success" | "warning" | "error";
   metadata?: Record<string, unknown>;
 }
 

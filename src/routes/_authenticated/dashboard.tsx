@@ -5,7 +5,6 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { StatCard } from "@/components/common/StatCard";
 import { CardSkeleton, EmptyState, ErrorState, GlassCard, StatSkeleton } from "@/components/common/States";
 import { ActivityStatusDot, ReplyStatusBadge } from "@/components/common/StatusBadge";
-import { DemoChip } from "@/components/common/DemoBadge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { timeAgo } from "@/lib/format";
@@ -34,7 +33,6 @@ function Dashboard() {
             <div className="flex items-center gap-2">
               <span className="truncate font-display text-sm font-semibold">@{account.data.username}</span>
               <Badge variant="mint">Connected</Badge>
-              {account.data.is_demo && <DemoChip />}
             </div>
             <div className="text-[11px] text-muted-foreground">
               {stats.data ? `${stats.data.activeRules} active rules` : "Loading…"}
@@ -53,7 +51,7 @@ function Dashboard() {
             <>
               <StatCard label="Connected accounts" value={stats.data.connectedAccounts} hint={stats.data.connectedAccounts ? "Instagram" : "None yet"} />
               <StatCard label="Total comments" value={stats.data.totalComments} />
-              <StatCard label="Replies sent" value={stats.data.repliesSent + stats.data.repliesSimulated} hint={stats.data.repliesSimulated ? `${stats.data.repliesSimulated} demo` : undefined} hintTone="amber" />
+              <StatCard label="Replies sent" value={stats.data.repliesSent} />
               <StatCard label="Active rules" value={stats.data.activeRules} hint={`of ${stats.data.totalRules} total`} />
               <StatCard label="Success rate" value={`${stats.data.successRate}%`} hint={stats.data.repliesFailed ? `${stats.data.repliesFailed} failed` : "No failures"} hintTone={stats.data.repliesFailed ? "rose" : "mint"} />
             </>
@@ -85,7 +83,6 @@ function Dashboard() {
                     <div className="truncate text-sm font-medium">{a.message}</div>
                     <div className="text-[10px] text-muted-foreground">{timeAgo(a.created_at)}</div>
                   </div>
-                  {a.status === "demo" && <DemoChip />}
                 </GlassCard>
               ))}
             </div>
@@ -97,7 +94,7 @@ function Dashboard() {
             <Link to="/comments" className="text-xs font-medium text-brand hover:underline">Manage</Link>
           </div>
           {comments.isPending ? <CardSkeleton /> : comments.isError ? <ErrorState onRetry={() => comments.refetch()} /> : comments.data.length === 0 ? (
-            <EmptyState icon={MessageSquare} title="No comments yet" description="In Demo Mode you can generate sample comments from the Comments page." />
+            <EmptyState icon={MessageSquare} title="No comments yet" description="Comments will appear here as they arrive from Instagram." />
           ) : (
             <div className="space-y-2">
               {comments.data.slice(0, 5).map((c) => (

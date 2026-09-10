@@ -18,7 +18,7 @@ const TYPE_GROUPS: Record<string, string[]> = {
   all: [],
   rules: ["rule_created", "rule_updated", "rule_deleted", "rule_enabled", "rule_disabled"],
   comments: ["comment_received"],
-  replies: ["reply_simulated", "reply_sent", "reply_failed", "reply_skipped"],
+  replies: ["reply_sent", "reply_failed", "reply_skipped"],
   instagram: ["instagram_connected", "instagram_disconnected"],
   account: ["profile_updated", "settings_updated"],
 };
@@ -63,7 +63,6 @@ function ActivityPage() {
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="success">Success</SelectItem>
-            <SelectItem value="demo">Demo</SelectItem>
             <SelectItem value="info">Info</SelectItem>
             <SelectItem value="warning">Warning</SelectItem>
             <SelectItem value="error">Failed</SelectItem>

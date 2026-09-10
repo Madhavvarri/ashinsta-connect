@@ -3,7 +3,7 @@ import type { Database } from "@/integrations/supabase/types";
 type Tables = Database["public"]["Tables"];
 
 export type Profile = Tables["profiles"]["Row"];
-export type InstagramAccount = Omit<Tables["instagram_accounts"]["Row"], "access_token">;
+export type InstagramAccount = Omit<Tables["instagram_accounts"]["Row"], "access_token" | "is_demo">;
 export type AutomationRule = Tables["automation_rules"]["Row"];
 export type AutomationRuleInsert = Tables["automation_rules"]["Insert"];
 export type Comment = Tables["comments"]["Row"];
@@ -11,8 +11,8 @@ export type CommentReply = Tables["comment_replies"]["Row"];
 export type ActivityLog = Tables["activity_logs"]["Row"];
 
 export type MatchType = "contains" | "exact" | "starts_with" | "ends_with";
-export type ReplyStatus = "simulated" | "sent" | "failed";
-export type ActivityStatus = "info" | "success" | "warning" | "error" | "demo";
+export type ReplyStatus = "sent" | "failed";
+export type ActivityStatus = "info" | "success" | "warning" | "error";
 
 export type ActivityType =
   | "rule_created"
@@ -21,7 +21,6 @@ export type ActivityType =
   | "rule_enabled"
   | "rule_disabled"
   | "comment_received"
-  | "reply_simulated"
   | "reply_sent"
   | "reply_failed"
   | "reply_skipped"

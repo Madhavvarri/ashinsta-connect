@@ -13,7 +13,6 @@ import type {
 } from "@/types";
 import type { RuleValues } from "@/lib/validation";
 import { logActivity } from "@/services/automation/engine";
-import { DEMO_ACCOUNT } from "@/services/automation/demo";
 
 function unwrap<T>(res: { data: T; error: { message: string } | null }): NonNullable<T> {
   if (res.error) throw new Error(res.error.message);
@@ -58,7 +57,7 @@ export async function updateProfile(
 
 // ---------- Instagram account ----------
 const IG_COLUMNS =
-  "id, user_id, instagram_user_id, username, profile_picture, token_expires_at, connected, is_demo, created_at, updated_at";
+  "id, user_id, instagram_user_id, username, profile_picture, token_expires_at, connected, created_at, updated_at";
 
 export async function getInstagramAccount(userId: string): Promise<InstagramAccount | null> {
   const { data, error } = await supabase
@@ -73,32 +72,6 @@ export async function getInstagramAccount(userId: string): Promise<InstagramAcco
   return data as InstagramAccount | null;
 }
 
-/** Demo Mode only: creates a clearly-labelled simulated Instagram connection. */
-export async function connectDemoInstagram(userId: string): Promise<InstagramAccount> {
-  const data = unwrap(
-    await supabase
-      .from("instagram_accounts")
-      .insert({
-        user_id: userId,
-        instagram_user_id: DEMO_ACCOUNT.instagram_user_id,
-        username: DEMO_ACCOUNT.username,
-        profile_picture: DEMO_ACCOUNT.profile_picture,
-        access_token: null,
-        connected: true,
-        is_demo: true,
-      })
-      .select(IG_COLUMNS)
-      .single(),
-  ) as InstagramAccount;
-  await logActivity(supabase, userId, {
-    type: "instagram_connected",
-    status: "demo",
-    message: `Demo Instagram account @${data.username} connected (simulated)`,
-    metadata: { account_id: data.id, demo: true },
-  });
-  return data;
-}
-
 export async function disconnectInstagram(userId: string, account: InstagramAccount): Promise<void> {
   const { error } = await supabase
     .from("instagram_accounts")
@@ -108,9 +81,9 @@ export async function disconnectInstagram(userId: string, account: InstagramAcco
   if (error) throw new Error(error.message);
   await logActivity(supabase, userId, {
     type: "instagram_disconnected",
-    status: account.is_demo ? "demo" : "info",
+    status: "info",
     message: `Instagram account @${account.username} disconnected`,
-    metadata: { account_id: account.id, demo: account.is_demo },
+    metadata: { account_id: account.id },
   });
 }
 
@@ -229,7 +202,6 @@ export interface DashboardStats {
   connectedAccounts: number;
   totalComments: number;
   repliesSent: number;
-  repliesSimulated: number;
   repliesFailed: number;
   activeRules: number;
   totalRules: number;
@@ -252,7 +224,6 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
   }
   const replyRows = replies.data ?? [];
   const sent = replyRows.filter((r) => r.status === "sent").length;
-  const simulated = replyRows.filter((r) => r.status === "simulated").length;
   const failed = replyRows.filter((r) => r.status === "failed").length;
   const total = replyRows.length;
   const ruleRows = rules.data ?? [];
@@ -260,10 +231,9 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
     connectedAccounts: accounts.count ?? 0,
     totalComments: comments.count ?? 0,
     repliesSent: sent,
-    repliesSimulated: simulated,
     repliesFailed: failed,
     activeRules: ruleRows.filter((r) => r.is_active).length,
     totalRules: ruleRows.length,
-    successRate: total ? Math.round(((sent + simulated) / total) * 100) : 0,
+    successRate: total ? Math.round((sent / total) * 100) : 0,
   };
 }
