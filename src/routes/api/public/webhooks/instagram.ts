@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createHmac, timingSafeEqual } from "crypto";
 import { z } from "zod";
-import { getServerAppMode } from "@/lib/config";
 import { processComment } from "@/services/automation/engine";
 import { createReplyProvider } from "@/services/instagram/provider";
 
@@ -12,9 +11,8 @@ import { createReplyProvider } from "@/services/instagram/provider";
  * POST — comment events, validated with X-Hub-Signature-256 (HMAC of raw body
  *        using META_APP_SECRET), then processed by the automation engine.
  *
- * Demo Mode never needs this endpoint: simulated comments are processed from the
- * Comments page. Configure META_APP_SECRET and META_WEBHOOK_VERIFY_TOKEN as
- * server secrets before pointing Meta at this URL.
+ * Configure META_APP_SECRET and META_WEBHOOK_VERIFY_TOKEN as server secrets
+ * before pointing Meta at this URL.
  */
 
 const eventSchema = z.object({
@@ -70,8 +68,7 @@ export const Route = createFileRoute("/api/public/webhooks/instagram")({
         if (!parsed.success) return new Response("Bad request", { status: 400 });
         if (parsed.data.object !== "instagram") return new Response("ok");
 
-        const mode = getServerAppMode();
-        const provider = createReplyProvider(mode);
+        const provider = createReplyProvider(process.env["META_GRAPH_API_VERSION"]);
         // Privileged client: webhooks carry no user session. Loaded inside the handler.
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -80,11 +77,13 @@ export const Route = createFileRoute("/api/public/webhooks/instagram")({
             if (change.field !== "comments" || !change.value.id || !change.value.text) continue;
             const { data: account } = await supabaseAdmin
               .from("instagram_accounts")
-              .select("id, user_id, access_token, is_demo")
+              .select("id, user_id, instagram_user_id, access_token")
               .eq("instagram_user_id", entry.id)
               .eq("connected", true)
               .maybeSingle();
             if (!account) continue;
+            // Ignore the account's own comments/replies so we never reply to ourselves.
+            if (change.value.from?.id && change.value.from.id === account.instagram_user_id) continue;
             try {
               await processComment(supabaseAdmin, provider, {
                 userId: account.user_id,
@@ -93,7 +92,6 @@ export const Route = createFileRoute("/api/public/webhooks/instagram")({
                 username: change.value.from?.username ?? "unknown",
                 commentText: change.value.text,
                 postId: change.value.media?.id ?? "",
-                isDemo: mode === "demo" || account.is_demo,
                 accessToken: account.access_token,
               });
             } catch (err) {

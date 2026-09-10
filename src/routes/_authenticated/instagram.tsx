@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Instagram, Loader2 } from "lucide-react";
-import { useConnectDemoInstagram, useDisconnectInstagram, useInstagramAccount } from "@/hooks/queries";
-import { IS_DEMO } from "@/lib/config";
+import { AlertTriangle, Instagram, Loader2 } from "lucide-react";
+import { useConnectInstagram, useDisconnectInstagram, useInstagramAccount, useInstagramSetupStatus } from "@/hooks/queries";
 import { formatDate } from "@/lib/format";
 import { PageHeader } from "@/components/common/PageHeader";
 import { CardSkeleton, ErrorState, GlassCard } from "@/components/common/States";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import { DemoChip } from "@/components/common/DemoBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -19,14 +17,16 @@ export const Route = createFileRoute("/_authenticated/instagram")({
 const PERMISSIONS = [
   "instagram_business_basic — read your profile and media",
   "instagram_business_manage_comments — read and reply to comments",
-  "instagram_business_manage_messages — (optional) reply in DMs",
 ];
 
 function InstagramPage() {
   const account = useInstagramAccount();
-  const connect = useConnectDemoInstagram();
+  const setup = useInstagramSetupStatus();
+  const connect = useConnectInstagram();
   const disconnect = useDisconnectInstagram();
   const [confirm, setConfirm] = useState(false);
+  const configured = setup.data?.configured ?? false;
+  const tokenExpired = account.data?.token_expires_at ? new Date(account.data.token_expires_at) < new Date() : false;
 
   return (
     <div className="space-y-6">
@@ -43,16 +43,23 @@ function InstagramPage() {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-display text-lg font-semibold">@{account.data.username}</span>
-                <Badge variant="mint">Connected</Badge>
-                {account.data.is_demo && <DemoChip />}
+                {tokenExpired ? <Badge variant="amber">Reconnect needed</Badge> : <Badge variant="mint">Connected</Badge>}
               </div>
               <p className="text-sm text-muted-foreground">Connected on {formatDate(account.data.created_at)}</p>
-              {account.data.is_demo && (
-                <p className="mt-1 text-xs text-amber">Simulated connection — no real Instagram account is linked.</p>
+              {account.data.token_expires_at && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Access {tokenExpired ? "expired" : "valid until"} {formatDate(account.data.token_expires_at)}
+                </p>
               )}
             </div>
           </div>
-          <div className="mt-5">
+          <div className="mt-5 flex flex-wrap gap-2">
+            {tokenExpired && (
+              <Button variant="brand" onClick={() => connect.mutate()} disabled={connect.isPending || !configured}>
+                {connect.isPending && <Loader2 className="animate-spin" aria-hidden />}
+                Reconnect Instagram
+              </Button>
+            )}
             <Button variant="destructive" onClick={() => setConfirm(true)} disabled={disconnect.isPending}>
               {disconnect.isPending && <Loader2 className="animate-spin" aria-hidden />}
               Disconnect
@@ -78,26 +85,40 @@ function InstagramPage() {
           <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
             Ashinsta uses only the official Meta / Instagram API. We never ask for your Instagram password and never scrape Instagram.
           </p>
-          {IS_DEMO ? (
-            <div className="mt-5 space-y-3">
-              <Button variant="brand" size="lg" onClick={() => connect.mutate()} disabled={connect.isPending}>
-                {connect.isPending && <Loader2 className="animate-spin" aria-hidden />}
-                Connect Demo Instagram
-              </Button>
-              <p className="text-xs text-amber">
-                Demo Mode: this creates a simulated account so you can test the whole app. No real connection is made.
+          <div className="mt-5 space-y-3">
+            <Button variant="brand" size="lg" onClick={() => connect.mutate()} disabled={connect.isPending || setup.isPending || !configured}>
+              {connect.isPending || setup.isPending ? <Loader2 className="animate-spin" aria-hidden /> : <Instagram aria-hidden />}
+              Connect Instagram
+            </Button>
+            <p className="text-xs text-muted-foreground">You'll be taken to Instagram to approve access, then brought straight back here.</p>
+          </div>
+        </GlassCard>
+      )}
+
+      {setup.data && !setup.data.configured && (
+        <GlassCard className="border-amber/30 p-5">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber" aria-hidden />
+            <div className="text-sm">
+              <h2 className="font-display text-[15px] font-semibold">Meta app setup required</h2>
+              <p className="mt-1 text-muted-foreground">
+                Connecting Instagram needs your Meta app credentials stored as server secrets. Missing:
               </p>
-            </div>
-          ) : (
-            <div className="mt-5 space-y-3">
-              <Button variant="brand" size="lg" disabled title="Meta app credentials required">
-                Connect Instagram
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Production mode requires Meta app credentials (META_APP_SECRET, verify token) and an approved Instagram app. Add them, then enable the official Meta login.
+              <ul className="mt-2 flex flex-wrap gap-1.5">
+                {setup.data.missing.map((m) => (
+                  <li key={m}><Badge variant="amber" className="font-mono normal-case tracking-normal">{m}</Badge></li>
+                ))}
+              </ul>
+              <p className="mt-3 text-muted-foreground">
+                In the Meta developer dashboard, add the Instagram product ("API setup with Instagram login"), then set this
+                redirect URI and webhook callback URL:
               </p>
+              <ul className="mt-2 space-y-1 font-mono text-xs">
+                <li>Redirect URI: {typeof window !== "undefined" ? `${window.location.origin}/instagram-callback` : "/instagram-callback"}</li>
+                <li>Webhook URL: {typeof window !== "undefined" ? `${window.location.origin}/api/public/webhooks/instagram` : "/api/public/webhooks/instagram"}</li>
+              </ul>
             </div>
-          )}
+          </div>
         </GlassCard>
       )}
 

@@ -20,6 +20,7 @@ import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCommentsRouteImport } from './routes/_authenticated/comments'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedInstagramRouteImport } from './routes/_authenticated/instagram'
+import { Route as AuthenticatedInstagramCallbackRouteImport } from './routes/_authenticated/instagram-callback'
 import { Route as AuthenticatedRulesRouteImport } from './routes/_authenticated/rules'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as ApiPublicWebhooksInstagramRouteImport } from './routes/api/public/webhooks/instagram'
@@ -78,6 +79,12 @@ const AuthenticatedInstagramRoute = AuthenticatedInstagramRouteImport.update({
   path: '/instagram',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInstagramCallbackRoute =
+  AuthenticatedInstagramCallbackRouteImport.update({
+    id: '/instagram-callback',
+    path: '/instagram-callback',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRulesRoute = AuthenticatedRulesRouteImport.update({
   id: '/rules',
   path: '/rules',
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/comments': typeof AuthenticatedCommentsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/instagram': typeof AuthenticatedInstagramRoute
+  '/instagram-callback': typeof AuthenticatedInstagramCallbackRoute
   '/rules': typeof AuthenticatedRulesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/api/public/webhooks/instagram': typeof ApiPublicWebhooksInstagramRoute
@@ -121,6 +129,7 @@ export interface FileRoutesByTo {
   '/comments': typeof AuthenticatedCommentsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/instagram': typeof AuthenticatedInstagramRoute
+  '/instagram-callback': typeof AuthenticatedInstagramCallbackRoute
   '/rules': typeof AuthenticatedRulesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/api/public/webhooks/instagram': typeof ApiPublicWebhooksInstagramRoute
@@ -138,6 +147,7 @@ export interface FileRoutesById {
   '/_authenticated/comments': typeof AuthenticatedCommentsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/instagram': typeof AuthenticatedInstagramRoute
+  '/_authenticated/instagram-callback': typeof AuthenticatedInstagramCallbackRoute
   '/_authenticated/rules': typeof AuthenticatedRulesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/api/public/webhooks/instagram': typeof ApiPublicWebhooksInstagramRoute
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/comments'
     | '/dashboard'
     | '/instagram'
+    | '/instagram-callback'
     | '/rules'
     | '/settings'
     | '/api/public/webhooks/instagram'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/comments'
     | '/dashboard'
     | '/instagram'
+    | '/instagram-callback'
     | '/rules'
     | '/settings'
     | '/api/public/webhooks/instagram'
@@ -186,6 +198,7 @@ export interface FileRouteTypes {
     | '/_authenticated/comments'
     | '/_authenticated/dashboard'
     | '/_authenticated/instagram'
+    | '/_authenticated/instagram-callback'
     | '/_authenticated/rules'
     | '/_authenticated/settings'
     | '/api/public/webhooks/instagram'
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInstagramRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/instagram-callback': {
+      id: '/_authenticated/instagram-callback'
+      path: '/instagram-callback'
+      fullPath: '/instagram-callback'
+      preLoaderRoute: typeof AuthenticatedInstagramCallbackRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rules': {
       id: '/_authenticated/rules'
       path: '/rules'
@@ -310,6 +330,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommentsRoute: typeof AuthenticatedCommentsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedInstagramRoute: typeof AuthenticatedInstagramRoute
+  AuthenticatedInstagramCallbackRoute: typeof AuthenticatedInstagramCallbackRoute
   AuthenticatedRulesRoute: typeof AuthenticatedRulesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
 }
@@ -320,6 +341,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommentsRoute: AuthenticatedCommentsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedInstagramRoute: AuthenticatedInstagramRoute,
+  AuthenticatedInstagramCallbackRoute: AuthenticatedInstagramCallbackRoute,
   AuthenticatedRulesRoute: AuthenticatedRulesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
 }

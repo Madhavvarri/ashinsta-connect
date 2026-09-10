@@ -50,14 +50,3 @@ export const profileSchema = z.object({
   full_name: z.string().trim().min(2, "Enter your full name").max(80, "Name is too long"),
 });
 export type ProfileValues = z.infer<typeof profileSchema>;
-
-export const simulateCommentSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(1, "Username is required")
-    .max(30)
-    .regex(/^[a-zA-Z0-9._]+$/, "Letters, numbers, dots and underscores only"),
-  comment_text: z.string().trim().min(1, "Comment is required").max(2200, "Comment is too long"),
-});
-export type SimulateCommentValues = z.infer<typeof simulateCommentSchema>;
