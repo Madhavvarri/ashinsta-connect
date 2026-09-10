@@ -1,20 +1,12 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, MessageSquare, Search, Sparkles } from "lucide-react";
-import { useComments, useInstagramAccount } from "@/hooks/queries";
-import { useDemoActions } from "@/hooks/useDemoActions";
-import { IS_DEMO } from "@/lib/config";
+import { MessageSquare, Search } from "lucide-react";
+import { useComments } from "@/hooks/queries";
 import { formatDateTime } from "@/lib/format";
-import { simulateCommentSchema, type SimulateCommentValues } from "@/lib/validation";
 import type { CommentWithReply, ReplyStatus } from "@/types";
 import { PageHeader } from "@/components/common/PageHeader";
-import { CardSkeleton, EmptyState, ErrorState, GlassCard } from "@/components/common/States";
+import { CardSkeleton, EmptyState, ErrorState } from "@/components/common/States";
 import { ReplyStatusBadge } from "@/components/common/StatusBadge";
-import { DemoChip } from "@/components/common/DemoBadge";
-import { FormField } from "@/components/auth/FormField";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -28,8 +20,6 @@ type Filter = "all" | "replied" | "not_replied";
 
 function CommentsPage() {
   const comments = useComments();
-  const account = useInstagramAccount();
-  const demo = useDemoActions(account.data);
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<CommentWithReply | null>(null);
@@ -45,47 +35,12 @@ function CommentsPage() {
     });
   }, [comments.data, filter, search]);
 
-  const form = useForm<SimulateCommentValues>({
-    resolver: zodResolver(simulateCommentSchema),
-    defaultValues: { username: "", comment_text: "" },
-  });
-
   return (
     <div className="space-y-6">
       <PageHeader
         title="Comments"
         description="Every comment received, with its reply status."
-        actions={
-          IS_DEMO && (
-            <Button variant="brand" onClick={() => demo.generateSampleComments.mutate()} disabled={demo.generateSampleComments.isPending}>
-              {demo.generateSampleComments.isPending ? <Loader2 className="animate-spin" aria-hidden /> : <Sparkles aria-hidden />}
-              Generate sample comments
-            </Button>
-          )
-        }
       />
-
-      {IS_DEMO && (
-        <GlassCard className="p-4">
-          <div className="flex items-center gap-2">
-            <h2 className="font-display text-[15px] font-semibold">Simulate an incoming comment</h2>
-            <DemoChip />
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">Runs the automation engine exactly like a webhook would — but nothing is sent to Instagram.</p>
-          <form
-            className="mt-3 grid gap-3 sm:grid-cols-[1fr_2fr_auto] sm:items-end"
-            noValidate
-            onSubmit={form.handleSubmit((v) => demo.simulateComment.mutate(v, { onSuccess: () => form.reset() }))}
-          >
-            <FormField label="Username" placeholder="maya.k" error={form.formState.errors.username?.message} {...form.register("username")} />
-            <FormField label="Comment" placeholder="Can you tell me the price?" error={form.formState.errors.comment_text?.message} {...form.register("comment_text")} />
-            <Button type="submit" variant="outline" className="h-11" disabled={demo.simulateComment.isPending}>
-              {demo.simulateComment.isPending && <Loader2 className="animate-spin" aria-hidden />}
-              Simulate
-            </Button>
-          </form>
-        </GlassCard>
-      )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
@@ -102,7 +57,7 @@ function CommentsPage() {
       </div>
 
       {comments.isPending ? <CardSkeleton rows={5} /> : comments.isError ? <ErrorState onRetry={() => comments.refetch()} /> : filtered.length === 0 ? (
-        <EmptyState icon={MessageSquare} title={comments.data.length === 0 ? "No comments yet" : "No matching comments"} description={comments.data.length === 0 ? (IS_DEMO ? "Generate sample comments to see the automation in action." : "Comments will appear here as they arrive from Instagram.") : "Try a different filter or search."} />
+        <EmptyState icon={MessageSquare} title={comments.data.length === 0 ? "No comments yet" : "No matching comments"} description={comments.data.length === 0 ? "Comments will appear here as they arrive from Instagram." : "Try a different filter or search."} />
       ) : (
         <div className="space-y-2">
           {filtered.map((c) => {
@@ -112,7 +67,6 @@ function CommentsPage() {
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold">@{c.username}</span>
-                    {c.is_demo && <DemoChip />}
                   </div>
                   <ReplyStatusBadge status={reply?.status as ReplyStatus | undefined} replied={c.replied} />
                 </div>
@@ -133,7 +87,7 @@ function CommentsPage() {
           {selected && (
             <>
               <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">@{selected.username} {selected.is_demo && <DemoChip />}</DialogTitle>
+                <DialogTitle className="flex items-center gap-2">@{selected.username}</DialogTitle>
                 <DialogDescription>{formatDateTime(selected.created_at)} · Post {selected.post_id || "—"}</DialogDescription>
               </DialogHeader>
               <div className="space-y-3 text-sm">
@@ -145,7 +99,7 @@ function CommentsPage() {
                 {selected.comment_replies.length > 0 ? (
                   selected.comment_replies.map((r) => (
                     <div key={r.id} className="rounded-xl border border-brand/20 bg-brand/5 p-3">
-                      <div className="text-[10px] font-semibold uppercase text-brand">{r.status === "simulated" ? "Simulated reply (Demo)" : r.status === "sent" ? "Reply sent" : "Reply failed"}</div>
+                      <div className="text-[10px] font-semibold uppercase text-brand">{r.status === "sent" ? "Reply sent" : "Reply failed"}</div>
                       <p className="mt-1">{r.reply_text}</p>
                       {r.error_message && <p className="mt-1 text-xs text-rose">{r.error_message}</p>}
                     </div>
