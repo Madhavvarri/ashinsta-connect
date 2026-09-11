@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import type { ConversationSummary, ThreadMessage } from "@/services/instagram/messaging.server";
 
 /**
@@ -13,27 +15,8 @@ import type { ConversationSummary, ThreadMessage } from "@/services/instagram/me
 
 export type MessagingStatus = "ok" | "not_connected" | "not_configured" | "needs_review";
 
-interface Account {
-  id: string;
-  instagram_user_id: string;
-  access_token: string | null;
-  granted_scopes: string[];
-}
-
 /** Loads the signed-in user's connected account (RLS-scoped) plus server Meta config. */
-async function loadContext(supabase: {
-  from: (t: "instagram_accounts") => {
-    select: (c: string) => {
-      eq: (c: string, v: unknown) => {
-        eq: (c: string, v: unknown) => {
-          order: (c: string, o: { ascending: boolean }) => {
-            limit: (n: number) => { maybeSingle: () => Promise<{ data: Account | null; error: unknown }> };
-          };
-        };
-      };
-    };
-  };
-}, userId: string) {
+async function loadContext(supabase: SupabaseClient<Database>, userId: string) {
   const meta = await import("@/services/instagram/meta.server");
   const cfg = meta.readMetaConfig();
   if (!cfg) return { status: "not_configured" as const };
@@ -66,7 +49,7 @@ function isPermissionError(err: unknown): boolean {
 export const getInstagramConversations = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ status: MessagingStatus; conversations: ConversationSummary[] }> => {
-    const ctx = await loadContext(context.supabase as never, context.userId);
+    const ctx = await loadContext(context.supabase, context.userId);
     if (ctx.status !== "ok") return { status: ctx.status, conversations: [] };
     try {
       const conversations = await ctx.messaging.listConversations(
@@ -88,7 +71,7 @@ export const getConversationMessages = createServerFn({ method: "GET" })
     z.object({ conversationId: z.string().min(1).max(256) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<{ status: MessagingStatus; messages: ThreadMessage[] }> => {
-    const ctx = await loadContext(context.supabase as never, context.userId);
+    const ctx = await loadContext(context.supabase, context.userId);
     if (ctx.status !== "ok") return { status: ctx.status, messages: [] };
     try {
       const messages = await ctx.messaging.getConversationMessages(
@@ -118,7 +101,7 @@ export const sendInstagramMessage = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<{ status: MessagingStatus; messageId: string | null }> => {
     const { supabase, userId } = context;
-    const ctx = await loadContext(supabase as never, userId);
+    const ctx = await loadContext(supabase, userId);
     if (ctx.status !== "ok") return { status: ctx.status, messageId: null };
 
     let sent: { messageId: string | null; recipientId: string };
