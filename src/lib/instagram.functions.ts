@@ -56,7 +56,7 @@ export const completeInstagramConnect = createServerFn({ method: "POST" })
 
     // Meta sometimes appends "#_" to the code in the redirect.
     const code = data.code.replace(/#_$/, "");
-    const { accessToken, expiresAt } = await meta.exchangeCodeForLongLivedToken(cfg, code, data.redirectUri);
+    const { accessToken, expiresAt, grantedScopes } = await meta.exchangeCodeForLongLivedToken(cfg, code, data.redirectUri);
     const profile = await meta.fetchInstagramProfile(cfg, accessToken);
 
     // Disconnect any previous connections for this user, then upsert this account.
@@ -76,6 +76,7 @@ export const completeInstagramConnect = createServerFn({ method: "POST" })
       profile_picture: profile.profilePicture,
       access_token: accessToken,
       token_expires_at: expiresAt,
+      granted_scopes: grantedScopes,
       connected: true,
     };
     const saved = existing
@@ -85,9 +86,19 @@ export const completeInstagramConnect = createServerFn({ method: "POST" })
 
     let webhookWarning: string | null = null;
     try {
-      await meta.subscribeToCommentWebhooks(cfg, profile.instagramUserId, accessToken);
-    } catch (err) {
-      webhookWarning = err instanceof Error ? err.message : "Could not subscribe to comment notifications";
+      const messaging = await import("@/services/instagram/messaging.server");
+      if (grantedScopes.length === 0 || grantedScopes.includes(messaging.MESSAGING_SCOPE)) {
+        // Subscribe to comments + messages when messaging access is available.
+        await messaging.subscribeToMessagingWebhooks(cfg, profile.instagramUserId, accessToken);
+      } else {
+        await meta.subscribeToCommentWebhooks(cfg, profile.instagramUserId, accessToken);
+      }
+    } catch {
+      try {
+        await meta.subscribeToCommentWebhooks(cfg, profile.instagramUserId, accessToken);
+      } catch (err) {
+        webhookWarning = err instanceof Error ? err.message : "Could not subscribe to comment notifications";
+      }
     }
 
     await supabase.from("activity_logs").insert({
@@ -100,5 +111,5 @@ export const completeInstagramConnect = createServerFn({ method: "POST" })
       metadata: { account_id: saved.data.id, webhook_warning: webhookWarning } as never,
     });
 
-    return { username: profile.username, webhookWarning };
+    return { username: profile.username, webhookWarning, grantedScopes };
   });

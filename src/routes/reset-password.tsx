@@ -15,10 +15,10 @@ export const Route = createFileRoute("/reset-password")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Set a new password — Ashinsta" },
-      { name: "description", content: "Choose a new password for your Ashinsta account." },
-      { property: "og:title", content: "Set a new password — Ashinsta" },
-      { property: "og:description", content: "Choose a new password for your Ashinsta account." },
+      { title: "Set a new password — AshConnect" },
+      { name: "description", content: "Choose a new password for your AshConnect account." },
+      { property: "og:title", content: "Set a new password — AshConnect" },
+      { property: "og:description", content: "Choose a new password for your AshConnect account." },
     ],
   }),
   component: ResetPasswordPage,

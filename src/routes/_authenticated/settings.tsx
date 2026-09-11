@@ -22,7 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Settings — Ashinsta" }] }),
+  head: () => ({ meta: [{ title: "Settings — AshConnect" }] }),
   component: SettingsPage,
 });
 

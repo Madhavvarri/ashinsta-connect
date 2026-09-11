@@ -131,7 +131,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="glass sticky top-0 z-30 flex items-center justify-between border-x-0 border-t-0 px-4 py-3 lg:hidden">
         <Link to="/dashboard" className="flex items-center gap-2" aria-label="Dashboard">
           <LogoMark className="size-8 text-sm" />
-          <span className="font-display text-[15px] font-bold tracking-tight">Ashinsta</span>
+          <span className="font-display text-[15px] font-bold tracking-tight">AshConnect</span>
         </Link>
         <div className="flex items-center gap-2">
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>

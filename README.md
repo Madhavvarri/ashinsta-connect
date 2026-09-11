@@ -1,6 +1,6 @@
-# Ashinsta Connect
+# AshConnect
 
-Build a complete, production-ready web application called Ashinsta.
+AshConnect — Instagram Business management: comments, direct messages and keyword automation, powered by the official Meta / Instagram API.
 
 Tagline: “Automate Instagram conversations. Grow engagement.”
 

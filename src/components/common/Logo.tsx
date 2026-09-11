@@ -16,7 +16,7 @@ export function LogoMark({ className }: { className?: string }) {
   );
 }
 
-export function Logo({ to = "/", subtitle = "Auto-replies for Instagram" }: { to?: "/" | "/dashboard"; subtitle?: string | null }) {
+export function Logo({ to = "/", subtitle = "Instagram Business management" }: { to?: "/" | "/dashboard"; subtitle?: string | null }) {
   return (
     <Link to={to} className="flex items-center gap-2" aria-label={`${APP_NAME} home`}>
       <LogoMark />

@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { timeAgo } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — Ashinsta" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — AshConnect" }] }),
   component: Dashboard,
 });
 

@@ -6,7 +6,12 @@
  */
 import { DEFAULT_GRAPH_API_VERSION, GRAPH_BASE_URL } from "./provider";
 
-export const INSTAGRAM_SCOPES = ["instagram_business_basic", "instagram_business_manage_comments"];
+export const INSTAGRAM_SCOPES = [
+  "instagram_business_basic",
+  "instagram_business_manage_comments",
+  // Messaging requires Meta App Review approval before Instagram grants it.
+  "instagram_business_manage_messages",
+];
 
 export interface MetaConfig {
   appId: string;
@@ -59,7 +64,16 @@ export async function exchangeCodeForLongLivedToken(cfg: MetaConfig, code: strin
       code,
     }),
   });
-  const short = await graphJson<{ access_token: string; user_id?: string | number }>(shortRes, "Meta rejected the login code");
+  const short = await graphJson<{ access_token: string; user_id?: string | number; permissions?: string[] | string }>(
+    shortRes,
+    "Meta rejected the login code",
+  );
+  // Meta reports the permissions the user actually granted; App Review gates messaging.
+  const grantedScopes = Array.isArray(short.permissions)
+    ? short.permissions
+    : typeof short.permissions === "string"
+      ? short.permissions.split(",").map((p) => p.trim()).filter(Boolean)
+      : [];
 
   const longParams = new URLSearchParams({
     grant_type: "ig_exchange_token",
@@ -70,7 +84,7 @@ export async function exchangeCodeForLongLivedToken(cfg: MetaConfig, code: strin
   const long = await graphJson<{ access_token: string; expires_in?: number }>(longRes, "Could not obtain a long-lived token");
 
   const expiresAt = new Date(Date.now() + (long.expires_in ?? 60 * 24 * 3600) * 1000).toISOString();
-  return { accessToken: long.access_token, expiresAt };
+  return { accessToken: long.access_token, expiresAt, grantedScopes };
 }
 
 export async function fetchInstagramProfile(cfg: MetaConfig, accessToken: string) {

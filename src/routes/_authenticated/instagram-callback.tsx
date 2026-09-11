@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/instagram-callback")({
       })
       .passthrough()
       .parse(s),
-  head: () => ({ meta: [{ title: "Connecting Instagram — Ashinsta" }] }),
+  head: () => ({ meta: [{ title: "Connecting Instagram — AshConnect" }] }),
   component: InstagramCallbackPage,
 });
 
