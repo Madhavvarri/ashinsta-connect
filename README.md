@@ -2,7 +2,7 @@
 
 AshConnect — Instagram Business management: comments, direct messages and keyword automation, powered by the official Meta / Instagram API.
 
-Tagline: “Automate Instagram conversations. Grow engagement.”
+Tagline: “Instagram Business management. Comments, messages and automation in one place.”
 
 I am not an experienced developer, so do NOT give me incomplete code, pseudo-code, placeholders, or instructions that require me to manually finish important functionality.
 
