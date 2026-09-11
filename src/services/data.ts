@@ -57,7 +57,7 @@ export async function updateProfile(
 
 // ---------- Instagram account ----------
 const IG_COLUMNS =
-  "id, user_id, instagram_user_id, username, profile_picture, token_expires_at, connected, created_at, updated_at";
+  "id, user_id, instagram_user_id, username, profile_picture, token_expires_at, connected, granted_scopes, created_at, updated_at";
 
 export async function getInstagramAccount(userId: string): Promise<InstagramAccount | null> {
   const { data, error } = await supabase
