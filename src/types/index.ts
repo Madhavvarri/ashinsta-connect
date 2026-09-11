@@ -3,7 +3,7 @@ import type { Database } from "@/integrations/supabase/types";
 type Tables = Database["public"]["Tables"];
 
 export type Profile = Tables["profiles"]["Row"];
-export type InstagramAccount = Omit<Tables["instagram_accounts"]["Row"], "access_token" | "is_demo">;
+export type InstagramAccount = Omit<Tables["instagram_accounts"]["Row"], "access_token">;
 export type AutomationRule = Tables["automation_rules"]["Row"];
 export type AutomationRuleInsert = Tables["automation_rules"]["Insert"];
 export type Comment = Tables["comments"]["Row"];

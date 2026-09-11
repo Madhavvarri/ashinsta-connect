@@ -100,7 +100,6 @@ export type Database = {
           created_at: string
           error_message: string | null
           id: string
-          is_demo: boolean
           replied_at: string | null
           reply_text: string
           rule_id: string | null
@@ -112,7 +111,6 @@ export type Database = {
           created_at?: string
           error_message?: string | null
           id?: string
-          is_demo?: boolean
           replied_at?: string | null
           reply_text: string
           rule_id?: string | null
@@ -124,7 +122,6 @@ export type Database = {
           created_at?: string
           error_message?: string | null
           id?: string
-          is_demo?: boolean
           replied_at?: string | null
           reply_text?: string
           rule_id?: string | null
@@ -155,7 +152,6 @@ export type Database = {
           id: string
           instagram_account_id: string | null
           instagram_comment_id: string
-          is_demo: boolean
           post_id: string
           replied: boolean
           user_id: string
@@ -167,7 +163,6 @@ export type Database = {
           id?: string
           instagram_account_id?: string | null
           instagram_comment_id: string
-          is_demo?: boolean
           post_id?: string
           replied?: boolean
           user_id: string
@@ -179,7 +174,6 @@ export type Database = {
           id?: string
           instagram_account_id?: string | null
           instagram_comment_id?: string
-          is_demo?: boolean
           post_id?: string
           replied?: boolean
           user_id?: string
@@ -202,7 +196,6 @@ export type Database = {
           created_at: string
           id: string
           instagram_user_id: string
-          is_demo: boolean
           profile_picture: string | null
           token_expires_at: string | null
           updated_at: string
@@ -215,7 +208,6 @@ export type Database = {
           created_at?: string
           id?: string
           instagram_user_id: string
-          is_demo?: boolean
           profile_picture?: string | null
           token_expires_at?: string | null
           updated_at?: string
@@ -228,7 +220,6 @@ export type Database = {
           created_at?: string
           id?: string
           instagram_user_id?: string
-          is_demo?: boolean
           profile_picture?: string | null
           token_expires_at?: string | null
           updated_at?: string
