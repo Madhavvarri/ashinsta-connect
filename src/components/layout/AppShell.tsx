@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   MessageSquare,
+  MessagesSquare,
   Settings,
   Zap,
   type LucideIcon,
@@ -27,6 +28,7 @@ type NavPath =
   | "/dashboard"
   | "/instagram"
   | "/comments"
+  | "/messages"
   | "/rules"
   | "/activity"
   | "/analytics"
@@ -43,13 +45,14 @@ export const NAV_ITEMS: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", short: "Home", icon: LayoutDashboard },
   { to: "/instagram", label: "Instagram", short: "Instagram", icon: Instagram },
   { to: "/comments", label: "Comments", short: "Comments", icon: MessageSquare },
+  { to: "/messages", label: "Messages", short: "Messages", icon: MessagesSquare },
   { to: "/rules", label: "Automation Rules", short: "Rules", icon: Zap },
   { to: "/activity", label: "Activity", short: "Activity", icon: Activity },
   { to: "/analytics", label: "Analytics", short: "Analytics", icon: BarChart3 },
   { to: "/settings", label: "Settings", short: "Settings", icon: Settings },
 ];
 
-const BOTTOM_NAV: NavPath[] = ["/dashboard", "/comments", "/rules", "/activity"];
+const BOTTOM_NAV: NavPath[] = ["/dashboard", "/comments", "/messages", "/rules"];
 
 export function useSignOut() {
   const navigate = useNavigate();
@@ -131,7 +134,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="glass sticky top-0 z-30 flex items-center justify-between border-x-0 border-t-0 px-4 py-3 lg:hidden">
         <Link to="/dashboard" className="flex items-center gap-2" aria-label="Dashboard">
           <LogoMark className="size-8 text-sm" />
-          <span className="font-display text-[15px] font-bold tracking-tight">Ashinsta</span>
+          <span className="font-display text-[15px] font-bold tracking-tight">AshConnect</span>
         </Link>
         <div className="flex items-center gap-2">
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>

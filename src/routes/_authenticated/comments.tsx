@@ -12,7 +12,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/comments")({
-  head: () => ({ meta: [{ title: "Comments — Ashinsta" }] }),
+  head: () => ({ meta: [{ title: "Comments — AshConnect" }] }),
   component: CommentsPage,
 });
 

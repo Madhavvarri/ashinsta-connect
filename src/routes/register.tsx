@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
-      { title: "Create account — Ashinsta" },
-      { name: "description", content: "Create your free Ashinsta account and start automating Instagram comment replies." },
-      { property: "og:title", content: "Create account — Ashinsta" },
+      { title: "Create account — AshConnect" },
+      { name: "description", content: "Create your free AshConnect account and start automating Instagram comment replies." },
+      { property: "og:title", content: "Create account — AshConnect" },
       { property: "og:description", content: "Start automating Instagram comment replies in minutes." },
     ],
   }),

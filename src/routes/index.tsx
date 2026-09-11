@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: `${APP_NAME} — ${APP_TAGLINE}` },
-      { name: "description", content: "Ashinsta replies to Instagram comments automatically with keyword rules you control." },
+      { name: "description", content: "AshConnect replies to Instagram comments automatically with keyword rules you control." },
       { property: "og:title", content: `${APP_NAME} — ${APP_TAGLINE}` },
       { property: "og:description", content: "Reply to Instagram comments automatically with keyword rules you control." },
     ],

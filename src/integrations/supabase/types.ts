@@ -194,6 +194,7 @@ export type Database = {
           access_token: string | null
           connected: boolean
           created_at: string
+          granted_scopes: string[]
           id: string
           instagram_user_id: string
           profile_picture: string | null
@@ -206,6 +207,7 @@ export type Database = {
           access_token?: string | null
           connected?: boolean
           created_at?: string
+          granted_scopes?: string[]
           id?: string
           instagram_user_id: string
           profile_picture?: string | null
@@ -218,6 +220,7 @@ export type Database = {
           access_token?: string | null
           connected?: boolean
           created_at?: string
+          granted_scopes?: string[]
           id?: string
           instagram_user_id?: string
           profile_picture?: string | null
@@ -227,6 +230,59 @@ export type Database = {
           username?: string
         }
         Relationships: []
+      }
+      instagram_messages: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          direction: string
+          id: string
+          instagram_account_id: string | null
+          message_id: string
+          message_text: string
+          recipient_id: string
+          sender_id: string
+          sender_username: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          instagram_account_id?: string | null
+          message_id: string
+          message_text?: string
+          recipient_id?: string
+          sender_id?: string
+          sender_username?: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          instagram_account_id?: string | null
+          message_id?: string
+          message_text?: string
+          recipient_id?: string
+          sender_id?: string
+          sender_username?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instagram_messages_instagram_account_id_fkey"
+            columns: ["instagram_account_id"]
+            isOneToOne: false
+            referencedRelation: "instagram_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

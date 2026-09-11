@@ -9,7 +9,7 @@ import { StatCard } from "@/components/common/StatCard";
 import { EmptyState, ErrorState, GlassCard, StatSkeleton } from "@/components/common/States";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — Ashinsta" }] }),
+  head: () => ({ meta: [{ title: "Analytics — AshConnect" }] }),
   component: AnalyticsPage,
 });
 

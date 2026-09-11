@@ -21,9 +21,9 @@ export const Route = createFileRoute("/login")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "Login — Ashinsta" },
-      { name: "description", content: "Log in to Ashinsta to manage your Instagram comment automation." },
-      { property: "og:title", content: "Login — Ashinsta" },
+      { title: "Login — AshConnect" },
+      { name: "description", content: "Log in to AshConnect to manage your Instagram comment automation." },
+      { property: "og:title", content: "Login — AshConnect" },
       { property: "og:description", content: "Log in to manage your Instagram comment automation." },
     ],
   }),

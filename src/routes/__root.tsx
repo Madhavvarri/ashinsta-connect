@@ -83,7 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: `${APP_NAME} — ${APP_TAGLINE}` },
-      { name: "description", content: "Ashinsta automates Instagram comment replies with keyword rules, cooldowns and a full activity log." },
+      { name: "description", content: "AshConnect automates Instagram comment replies with keyword rules, cooldowns and a full activity log." },
       { name: "author", content: APP_NAME },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

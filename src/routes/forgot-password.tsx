@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
     meta: [
-      { title: "Forgot password — Ashinsta" },
-      { name: "description", content: "Reset your Ashinsta password by email." },
-      { property: "og:title", content: "Forgot password — Ashinsta" },
-      { property: "og:description", content: "Reset your Ashinsta password by email." },
+      { title: "Forgot password — AshConnect" },
+      { name: "description", content: "Reset your AshConnect password by email." },
+      { property: "og:title", content: "Forgot password — AshConnect" },
+      { property: "og:description", content: "Reset your AshConnect password by email." },
     ],
   }),
   component: ForgotPasswordPage,

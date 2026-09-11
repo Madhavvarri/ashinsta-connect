@@ -23,7 +23,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 
 export const Route = createFileRoute("/_authenticated/rules")({
   validateSearch: (s) => z.object({ create: z.boolean().optional() }).parse(s),
-  head: () => ({ meta: [{ title: "Automation Rules — Ashinsta" }] }),
+  head: () => ({ meta: [{ title: "Automation Rules — AshConnect" }] }),
   component: RulesPage,
 });
 
@@ -181,7 +181,7 @@ function RulesPage() {
         <DialogContent className="glass max-h-[90vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
             <DialogTitle>{editing === "new" ? "New rule" : "Edit rule"}</DialogTitle>
-            <DialogDescription>When a comment matches the keyword, Ashinsta replies with your message.</DialogDescription>
+            <DialogDescription>When a comment matches the keyword, AshConnect replies with your message.</DialogDescription>
           </DialogHeader>
           {editing && (
             <RuleForm

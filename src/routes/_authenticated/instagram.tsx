@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/instagram")({
-  head: () => ({ meta: [{ title: "Instagram — Ashinsta" }] }),
+  head: () => ({ meta: [{ title: "Instagram — AshConnect" }] }),
   component: InstagramPage,
 });
 
@@ -83,7 +83,7 @@ function InstagramPage() {
           </div>
           <h2 className="mt-4 font-display text-lg font-semibold">Not connected</h2>
           <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-            Ashinsta uses only the official Meta / Instagram API. We never ask for your Instagram password and never scrape Instagram.
+            AshConnect uses only the official Meta / Instagram API. We never ask for your Instagram password and never scrape Instagram.
           </p>
           <div className="mt-5 space-y-3">
             <Button variant="brand" size="lg" onClick={() => connect.mutate()} disabled={connect.isPending || setup.isPending || !configured}>
